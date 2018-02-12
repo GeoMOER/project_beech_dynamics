@@ -15,8 +15,9 @@ cores = 8
 cl = parallel::makeCluster(cores)
 doParallel::registerDoParallel(cl)
 
+#######################################################################################################
+##### First quality assurance #####
 
-## First quality assurance
 p = c("NDVI.tif$", "reliability.tif$")
 ndvi.rst = lapply(p, function(p){
   ndvi = stack(list.files(path_modis_prj, pattern = p, full.names = TRUE))
@@ -39,8 +40,8 @@ suppressWarnings(
 
 ndvi.rst.qa = stack(lst_ndvi_qa)
 
-
-## Subset MODIS files into tiles
+#######################################################################################################
+##### Subset MODIS files into tiles #####
 p = c("NDVI.tif$")
 ndvi.rst.qa = raster::stack(list.files(path_modis_quality_checked, pattern = p, full.names = TRUE))
 tileRaster(raster = ndvi.rst.qa, tilenbr = c(12,10), overlap = 10, outpath = path_modis_quality_checked_tiles)
@@ -54,7 +55,9 @@ ndvi.rst.doy = raster::stack(list.files(path_modis_prj, pattern = p, full.names 
 tileRaster(raster = ndvi.rst.doy, tilenbr = c(12,10), overlap = 10, outpath = path_modis_qua_tiles)
 
 
-## Additional outlier check
+#######################################################################################################
+##### Additional outlier check ####
+
 dirs = list.dirs(path_modis_quality_checked_tiles)[-1]
 dirs = dirs[-seq(7)]
 
@@ -99,8 +102,8 @@ for(dir in dirs){
   gc()
 }
 
-
-## Whittaker smoother
+#######################################################################################################
+##### Whittaker smoother #####
 dirs = list.dirs(path_modis_outliers_tiles)[-1]
 
 for(dir in dirs){
@@ -140,8 +143,8 @@ for(dir in dirs){
 
 }
 
-
-## Scaling, temporal aggregation, deseasoning and trend computation
+#######################################################################################################
+##### Scaling, temporal aggregation, deseasoning and trend computation ####
 dirs = list.dirs(path_modis_whittaker_tiles)[-1]
 for(dir in dirs){
   p =  "^.*_NDVI_.*\\.tif$"
@@ -170,8 +173,8 @@ for(dir in dirs){
                       writeRaster(rst, filename = j, format = "GTiff", overwrite = TRUE)
                     }
   rst_scl = stack(lst_scl)
-
-  # temporal composite
+  #######################################################################################################
+  ##### temporal composite ####
   # files = list.files(paste0(path_modis_scaled_tiles, basename(dir), "/"), pattern = "^.*_NDVI_.*\\.tif$", full.names = TRUE)
   # rst_scl = stack(files)
   dir_doy = paste0(path_modis_doy_tiles, basename(dir), "/")
@@ -181,7 +184,8 @@ for(dir in dirs){
   end = which(substr(basename(files_doy), 10, 16) %in% substr(names(rst_scl)[nlayers(rst_scl)], 13, 19))
   rst_doy = stack(files_doy[start:end])
 
-  # Bug in MODIS (extractDate)
+  #######################################################################################################
+  ##### Bug in MODIS (extractDate) ####
   names(rst_doy) = substr(names(rst_doy), 1, nchar(names(rst_doy))-22)
   names(rst_doy) = paste0(substr(names(rst_doy), 1, 17), "h18v03.005.2010239071130.hdf")
 
@@ -191,7 +195,8 @@ for(dir in dirs){
                              timeInfo = layer_dates, interval = "fortnight",
                              fun = max, na.rm = TRUE, cores = 4L)
 
-  # rst_fn = stack(list.files(subpath, pattern = glob2rx("*.tif"), full.names = TRUE))
+  #######################################################################################################
+  ##### rst_fn = stack(list.files(subpath, pattern = glob2rx("*.tif"), full.names = TRUE)) ####
   subpath = paste0(path_modis_temp_agg_tiles, basename(dir), "/")
   if (!dir.exists(subpath))
     dir.create(subpath, recursive = TRUE)
@@ -204,8 +209,8 @@ for(dir in dirs){
   writeRaster(rst_fn, filename = rst_fn_names,
               format = "GTiff", bylayer = TRUE, overwrite = TRUE)
 
-
-  # fill gaps in temporal aggregation using linear interpolation
+  #######################################################################################################
+  ##### fill gaps in temporal aggregation using linear interpolation ####
   rst_fn_mat = raster::as.matrix(rst_fn)
   # 43701
   rst_fn_mat_filled =
@@ -257,8 +262,8 @@ for(dir in dirs){
   lst_fn_filled = foreach(i = raster::unstack(rst_fn_filled), j = as.list(fls_fn_filled)) %do% {
     raster::writeRaster(i, filename = j, format = "GTiff", overwrite = TRUE)
   }
-
-  # deseason
+  #######################################################################################################
+  ##### deseason ####
   # files = list.files(subpath, pattern = "^.*_NDVI_.*\\.tif$", full.names = TRUE)
   # rst_fn_filled = stack(files)
   start = grep("2003001", names(rst_fn_filled))
@@ -277,8 +282,8 @@ for(dir in dirs){
     raster::writeRaster(i, filename = j, format = "GTiff", overwrite = TRUE)
   }
 
-
-  # trend
+  #######################################################################################################
+  ##### trend ####
   subpath = paste0(path_modis_mktrends_tiles, basename(dir), "/")
   if (!dir.exists(subpath))
     dir.create(subpath, recursive = TRUE)
@@ -298,8 +303,8 @@ for(dir in dirs){
 }
 
 
-
-## deregister parallel backend
+#######################################################################################################
+##### deregister parallel backend ####
 if (cores > 1L)
   parallel::stopCluster(cl)
 
@@ -308,6 +313,8 @@ if (cores > 1L)
 trends_stau_1000 = list.files(path_modis_mktrends_tiles, pattern = glob2rx("*tau_1.000.tif"),
                               recursive = TRUE, full.names = TRUE)
 mergeTiledRasters(rasterlist = trends_stau_1000,  overlap = 10, outpath = paste0(path_modis_results, "MK_DSN_FLD_A2003_2016_tau_1.000.tif"))
+
+
 
 #
 # https://github.com/environmentalinformatics-marburg/paper_kilimanjaro_ndvi_comparison/blob/master/R/qcMCD13.R
