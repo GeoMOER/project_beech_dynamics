@@ -40,6 +40,7 @@ suppressWarnings(
 
 ndvi.rst.qa = stack(lst_ndvi_qa)
 
+
 #######################################################################################################
 ##### Subset MODIS files into tiles #####
 p = c("NDVI.tif$")
@@ -217,7 +218,6 @@ for(dir in dirs){
     foreach(i = 1:nrow(rst_fn_mat), .packages = lib,
             .export = ls(envir = globalenv())) %dopar% {
               val = rst_fn_mat[i, ]
-              val_length = length(val)
               if(sum(is.na(val))/val_length < 0.5){
                 nas = rle(is.na(val))
                 nas_lg = which(nas$lengths & nas$values)
