@@ -57,7 +57,7 @@ tileRaster(raster = ndvi.rst.doy, tilenbr = c(12,10), overlap = 10, outpath = pa
 
 
 #######################################################################################################
-##### Additional outlier check ####
+##### Additional outlier check #####
 
 dirs = list.dirs(path_modis_quality_checked_tiles)[-1]
 dirs = dirs[-seq(7)]
