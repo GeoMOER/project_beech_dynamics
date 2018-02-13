@@ -1,32 +1,40 @@
-# Set path ---------------------------------------------------------------------
+# Set pathes -------------------------------------------------------------------
 if(Sys.info()["sysname"] == "Windows"){
-  filepath_base = "F:/modis_carpathian_mountains/"
+  filepath_base = "F:/modis_carpathian_mountains"
 } else {
-  filepath_base = "/mnt/sd19006/data/processing_data/modis_carpathian_mountains/"
+  filepath_base = "/mnt/sd19006/data/processing_data/modis_carpathian_mountains/data"
 }
 
-path_data = filepath_base
-path_modis = paste0(filepath_base, "modis/")
-path_modis_arc = paste0(path_modis, "MODIS_ARC/")
-path_modis_prj = paste0(path_modis_arc, "PROCESSED/carpathian_mountains/")
-path_modis_tiles = paste0(path_modis, "tiles/")
-path_modis_adj = paste0(path_modis, "modis_adj/")
-path_modis_quality_checked = paste0(path_modis, "modis_quality_checked/")
-path_modis_quality_checked_tiles = paste0(path_modis, "modis_quality_checked_tiles/")
-path_modis_doy_tiles = paste0(path_modis, "modis_doy_tiles/")
-path_modis_qua_tiles = paste0(path_modis, "modis_qua_tiles/")
-path_modis_outliers_tiles = paste0(path_modis, "modis_outliers_tiles/")
-path_modis_whittaker_tiles = paste0(path_modis, "modis_whittaker_tiles/")
-path_modis_scaled_tiles = paste0(path_modis, "modis_scaled_tiles/")
-path_modis_temp_agg_tiles = paste0(path_modis, "modis_temp_agg_tiles/")
-path_modis_filled_tiles = paste0(path_modis, "modis_filled_tiles/")
-path_modis_deseason_tiles = paste0(path_modis, "modis_deseason_tiles/")
-path_modis_mktrends_tiles = paste0(path_modis, "modis_mktrends_tiles/")
-path_modis_results= paste0(path_modis, "modis_results/")
-path_rdata = paste0(path_modis, "rdata/")
-path_temp = paste0(path_modis, "temp/")
-path_output = paste0(path_modis, "output/")
-path_vectors = paste0(path_data, "vectors/")
+# Basic data path
+path_data = paste0(filepath_base, "/data")
+
+# Path to original modis dataset
+path_modis = paste0(path_data, "/modis")
+path_modis_arc = paste0(path_modis, "/MODIS_ARC")
+path_modis_prj = paste0(path_modis_arc, "/PROCESSED/carpathian_mountains")
+path_modis_adj = paste0(path_modis, "/modis_adj")
+
+# Path to top-level tile directory
+path_modis_tiles = paste0(path_modis, "/tiles")
+
+# Subpathes defining modis processing steps
+subpath_modis_ndvi = "/modis_ndvi"
+subpath_modis_doy = "/modis_doy"
+subpath_modis_quality = "/modis_quality"
+subpath_modis_quality_checked = "/modis_quality_checked"
+subpath_modis_outlier_checked = "/modis_outlier_checked"
+subpath_modis_whittaker_smoothed = "/modis_whittaker_smoothed"
+subpath_modis_scaled = "/modis_scaled"
+subpath_modis_temporal_aggregated = "/modis_temporal_aggregated"
+subpath_modis_filled_timeseries = "/modis_filled_timeseries"
+subpath_modis_deseasoned = "/modis_deseasoned"
+subpath_modis_mktrend = "/modis_mktrend"
+
+# Path to results etc.
+path_rdata = paste0(path_data, "/rdata")
+path_temp = paste0(path_data, "/temp")
+path_output = paste0(path_data, "/output")
+path_vectors = paste0(path_data, "/vectors")
 
 
 # Set libraries ----------------------------------------------------------------
