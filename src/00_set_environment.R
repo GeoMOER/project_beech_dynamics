@@ -1,6 +1,6 @@
 # Set path ---------------------------------------------------------------------
 if(Sys.info()["sysname"] == "Windows"){
-  filepath_base = "E:/modis_carpathian_mountains/"
+  filepath_base = "F:/modis_carpathian_mountains/"
 } else {
   filepath_base = "/mnt/sd19006/data/processing_data/modis_carpathian_mountains/"
 }
@@ -9,6 +9,7 @@ path_data = filepath_base
 path_modis = paste0(filepath_base, "modis/")
 path_modis_arc = paste0(path_modis, "MODIS_ARC/")
 path_modis_prj = paste0(path_modis_arc, "PROCESSED/carpathian_mountains/")
+path_modis_tiles = paste0(path_modis, "tiles/")
 path_modis_adj = paste0(path_modis, "modis_adj/")
 path_modis_quality_checked = paste0(path_modis, "modis_quality_checked/")
 path_modis_quality_checked_tiles = paste0(path_modis, "modis_quality_checked_tiles/")
@@ -31,7 +32,7 @@ path_vectors = paste0(path_data, "vectors/")
 # Set libraries ----------------------------------------------------------------
 library(doParallel)
 library(GSODTools)
-# library(gimms)
+library(gimms)
 library(rgeos)
 # library(mapview)
 library(MODIS)
@@ -39,7 +40,7 @@ library(MODIS)
 library(raster)
 library(rgdal)
 library(remote)
-# library(satelliteTools)  # devtools::install_github("environmentalinformatics-marburg/satelliteTools")
+library(satelliteTools)  # devtools::install_github("environmentalinformatics-marburg/satelliteTools")
 library(sp)
 
 # Other settings ---------------------------------------------------------------
