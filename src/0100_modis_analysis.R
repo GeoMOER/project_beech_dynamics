@@ -10,6 +10,7 @@
 #'                               |
 #'                               |-c0001-0511_r0001-0522
 #'                                          |
+#'                                          |-modis
 #'                                          |-modis_quality_checked
 #'                                          |
 #'                                          |-modis_outlier_checked
@@ -48,3 +49,12 @@ qlt_rst = raster::stack(list.files(path_modis_prj, pattern = p, full.names = TRU
 tileRaster(raster = qlt_rst, tilenbr = c(12,10), overlap = 10, outpath = path_modis_tiles)
 
 
+## Compute quality check for NDVI data
+
+for(act_tile_path in tilepath){
+act_tile_path # Actual tile path (e.g. "<some individual path>/modis/tiles/c0001-0511_r0001-0522/")
+
+p = c("NDVI.tif$")
+ndvi_rst = raster::stack(list.files(dir, pattern = p, full.names = TRUE))
+tileRaster(raster = ndvi_rst, tilenbr = c(12,10), overlap = 10, outpath = path_modis_tiles)
+}
