@@ -80,7 +80,7 @@ ndvi_files = list.files(paste0(act_tile_path, "/", subpath_modis_ndvi),
 ndvi_rst = raster::stack(ndvi_files)
 
 reliability_files = list.files(paste0(act_tile_path, "/", subpath_modis_reliability),
-                           pattern = glob2rx("*.tif"), full.names = TRUE)
+                               pattern = glob2rx("*.tif"), full.names = TRUE)
 reliability_rst = raster::stack(reliability_files)
 
 outfiles = compileOutFilePath(input_filepath = ndvi_files,
@@ -92,16 +92,16 @@ ndvi_qc_rst = qualityCheck(rstck_values = ndvi_rst,
                            outputfilepathes = outfiles)
 
 if(test = TRUE){
-  checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
-  saveRDS(ndvi_qc_rst, file = paste0(path_rdata, "data_small_test_01_ndvi_qc_rst.rds"))
-  saveRDS(outfiles, file = paste0(path_rdata, "data_small_test_01_outfiles.rds"))
+  checkResults(file = outfiles[1], subpath_file = "/data_small_test", subpath_test = "/data_small")
+  saveRDS(ndvi_qc_rst, file = paste0(path_rdata, "/data_small_test_01_ndvi_qc_rst.rds"))
+  saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_01_outfiles.rds"))
 }
 
 
 #### Compute outlier check for NDVI data
 if(test = TRUE){
-  ndvi_qc_rst = readRDS(paste0(path_rdata, "data_small_test_01_ndvi_qc_rst.rds"))
-  outfiles = readRDS(paste0(path_rdata, "data_small_test_01_outfiles.rds"))
+  ndvi_qc_rst = readRDS(paste0(path_rdata, "/data_small_test_01_ndvi_qc_rst.rds"))
+  outfiles = readRDS(paste0(path_rdata, "/data_small_test_01_outfiles.rds"))
   # Alternative
   # ndvi_qc_files = list.files(paste0(act_tile_path, "/", subpath_modis_quality_checked),
   #                            pattern = glob2rx("*.tif"), full.names = TRUE)
@@ -117,9 +117,9 @@ ndvi_oc_rst = outlierCheck(rstack = ndvi_qc_rst, outfilepathes = outfiles,
 
 
 if(test = TRUE){
-  checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
-  saveRDS(ndvi_oc_rst, file = paste0(path_rdata, "data_small_test_02_ndvi_oc_rst.rds"))
-  saveRDS(outfiles, file = paste0(path_rdata, "data_small_test_02_outfiles.rds"))
+  checkResults(file = outfiles[1], subpath_file = "/data_small_test", subpath_test = "/data_small")
+  saveRDS(ndvi_oc_rst, file = paste0(path_rdata, "/data_small_test_02_ndvi_oc_rst.rds"))
+  saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_02_outfiles.rds"))
 }
 
 
@@ -136,12 +136,12 @@ outfiles = compileOutFilePath(input_filepath = outfiles,
                               prefix=NA, suffix="ws")
 
 whittakerSmoother(vi = ndvi_oc_rst, names_vi = wfiles,
-                              pos1=10, pos2=16,
-                              begin="2002185", end="2017345",
-                              quality_stck=NULL,
-                              doy_stck=NULL,
-                              outfilepath = outfiles,
-                              lambda = 6000, nIter = 3, threshold = 2000)
+                  pos1=10, pos2=16,
+                  begin="2002185", end="2017345",
+                  quality_stck=NULL,
+                  doy_stck=NULL,
+                  outfilepath = outfiles,
+                  lambda = 6000, nIter = 3, threshold = 2000, pillow = 0)
 
 if(test = TRUE){
   ndvi_ws_files = list.files(paste0(act_tile_path, "/", subpath_modis_whittaker_smoothed),
