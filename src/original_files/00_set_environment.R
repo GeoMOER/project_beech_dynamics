@@ -2,11 +2,11 @@
 if(Sys.info()["sysname"] == "Windows"){
   filepath_base = "F:/modis_carpathian_mountains"
 } else {
-  filepath_base = "/mnt/sd19006/data/processing_data/modis_carpathian_mountains/data_small_test"
+  filepath_base = "/mnt/sd19006/data/processing_data/modis_carpathian_mountains/data"
 }
 
 # Basic data path
-path_data = paste0(filepath_base, "/data_small_test")
+path_data = paste0(filepath_base, "/data")
 
 # Path to original modis dataset
 path_modis = paste0(path_data, "/modis")
@@ -21,7 +21,6 @@ path_modis_tiles = paste0(path_modis, "/tiles")
 subpath_modis_ndvi = "/modis_ndvi"
 subpath_modis_doy = "/modis_doy"
 subpath_modis_quality = "/modis_quality"
-subpath_modis_reliability = "/modis_reliability"
 subpath_modis_quality_checked = "/modis_quality_checked"
 subpath_modis_outlier_checked = "/modis_outlier_checked"
 subpath_modis_whittaker_smoothed = "/modis_whittaker_smoothed"
