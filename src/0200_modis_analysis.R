@@ -86,7 +86,7 @@ outfiles = compileOutFilePath(input_filepath = ndvi_files,
                               prefix=NA, suffix="qc")
 
 ndvi_qc_rst = qualityCheck(rstck_values = ndvi_rst,
-                           rstck_quality = quality_rst,
+                           rstck_quality = reliability_rst,
                            outputfilepathes = outfiles)
 
 checkResults (file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
