@@ -270,7 +270,7 @@ for(dir in dirs){
   start = grep("2003001", names(rst_fn_filled))
   end = grep("2017001", names(rst_fn_filled))-1
 
-  rst_dsn = remote::deseason(rst_fn_filled[[start:end]], cycle.window = 24L,
+  rst_dsn = remote::deseason([[start:end]], cycle.window = 24L,
                              use.cpp = TRUE)
 
   names(rst_dsn) = paste0("DSN_", names(rst_fn_filled[[start:end]]))
