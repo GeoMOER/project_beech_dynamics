@@ -18,7 +18,7 @@
 #'                                              |-modis_doy
 #'                                              |
 #'                                              |-modis_qualflag
-#'                                              |                                                                                    
+#'                                              |
 #'                                              |-modis_quality_checked
 #'                                              |
 #'                                              |-modis_outlier_checked
@@ -46,7 +46,7 @@ if (!dir.exists(path_modis_tiles))
 
 p = c("NDVI.tif$")
 ndvi_rst = raster::stack(list.files(path_modis_prj, pattern = p, full.names = TRUE))
-tileRaster(raster = ndvi_rst, tilenbr = c(12,10), overlap = 10, 
+tileRaster(raster = ndvi_rst, tilenbr = c(12,10), overlap = 10,
            outpath = path_modis_tiles, subpath = subpath_modis_ndvi)
 
 p = c("composite_day_of_the_year.tif$")
@@ -56,9 +56,13 @@ tileRaster(raster = doy_rst, tilenbr = c(12,10), overlap = 10,
 
 p = c("Quality.tif$")
 qlt_rst = raster::stack(list.files(path_modis_prj, pattern = p, full.names = TRUE))
-tileRaster(raster = qlt_rst, tilenbr = c(12,10), overlap = 10, 
+tileRaster(raster = qlt_rst, tilenbr = c(12,10), overlap = 10,
            outpath = path_modis_tiles, subpath = subpath_modis_quality)
 
+p = c("reliability.tif$")
+rlb_rst = raster::stack(list.files(path_modis_prj, pattern = p, full.names = TRUE))
+tileRaster(raster = rlb_rst, tilenbr = c(12,10), overlap = 10,
+           outpath = path_modis_tiles, subpath = subpath_modis_reliability)
 
 
 #### Start loop
@@ -69,24 +73,23 @@ act_tile_path = tilepathes[1] # will be replaced by the loop later
 
 
 #### Compute quality check for NDVI data
-ndvi_files = list.files(paste0(act_tile_path, "/", subpath_modis_ndvi), 
+ndvi_files = list.files(paste0(act_tile_path, "/", subpath_modis_ndvi),
                         pattern = glob2rx("*.tif"), full.names = TRUE)
 ndvi_rst = raster::stack(ndvi_files)
 
-quality_files = list.files(paste0(act_tile_path, "/", subpath_modis_quality), 
+reliability_files = list.files(paste0(act_tile_path, "/", subpath_modis_reliability),
                            pattern = glob2rx("*.tif"), full.names = TRUE)
-quality_rst = raster::stack(quality_files)
+reliability_rst = raster::stack(reliability_files)
 
-outfiles = compileOutFilePath(input_filepath = ndvi_files, 
-                              output_subdirectory = subpath_modis_quality_checked, 
+outfiles = compileOutFilePath(input_filepath = ndvi_files,
+                              output_subdirectory = subpath_modis_quality_checked,
                               prefix=NA, suffix="qc")
 
-
-ndvi_qc_rst = qualityCheck(rstck_values = ndvi_rst, 
-                           rstck_quality = quality_rst, 
+ndvi_qc_rst = qualityCheck(rstck_values = ndvi_rst,
+                           rstck_quality = quality_rst,
                            outputfilepathes = outfiles)
 
-
+checkResults (file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
 
 #### Compute outlier check for NDVI data
 # Load data from disk or use stack from step above
