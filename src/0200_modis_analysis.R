@@ -33,9 +33,11 @@
 source("C:/Users/tnauss/permanent/edu/msc-phygeo-environmental-observations/git/project_beech_dynamics/src/00_set_environment.R")
 lib = c("beechForestDynamics", "doParallel", "raster", "rgdal", "GSODTools")
 
+# Test run?
+test = TRUE
 
 # Define parallelization information
-cores = 2
+cores = 3
 cl = parallel::makeCluster(cores)
 doParallel::registerDoParallel(cl)
 
@@ -89,19 +91,176 @@ ndvi_qc_rst = qualityCheck(rstck_values = ndvi_rst,
                            rstck_quality = reliability_rst,
                            outputfilepathes = outfiles)
 
-checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
+if(test = TRUE){
+  checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
+  saveRDS(ndvi_qc_rst, file = paste0(path_rdata, "data_small_test_01_ndvi_qc_rst.rds"))
+  saveRDS(outfiles, file = paste0(path_rdata, "data_small_test_01_outfiles.rds"))
+}
+
 
 #### Compute outlier check for NDVI data
-# Load data from disk or use stack from step above
-# ndvi_qc_files = list.files(paste0(act_tile_path, "/", subpath_modis_quality_checked),
-#                            pattern = glob2rx("*.tif"), full.names = TRUE)
-# ndvi_qc_rst = stack(ndvi_qc_files)
+if(test = TRUE){
+  ndvi_qc_rst = readRDS(paste0(path_rdata, "data_small_test_01_ndvi_qc_rst.rds"))
+  outfiles = readRDS(paste0(path_rdata, "data_small_test_01_outfiles.rds"))
+  # Alternative
+  # ndvi_qc_files = list.files(paste0(act_tile_path, "/", subpath_modis_quality_checked),
+  #                            pattern = glob2rx("*.tif"), full.names = TRUE)
+  # ndvi_qc_rst = stack(ndvi_qc_files)
+  # outfiles = ndvi_qc_files
+}
+outfiles = compileOutFilePath(input_filepath = outfiles,
+                              output_subdirectory = subpath_modis_outlier_checked,
+                              prefix=NA, suffix="oc")
 
-ndvi_qc_rst
+ndvi_oc_rst = outlierCheck(rstack = ndvi_qc_rst, outfilepathes = outfiles,
+                           lq=0.4, uq=0.9)
+
+
+if(test = TRUE){
+  checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
+  saveRDS(ndvi_oc_rst, file = paste0(path_rdata, "data_small_test_02_ndvi_oc_rst.rds"))
+  saveRDS(outfiles, file = paste0(path_rdata, "data_small_test_02_outfiles.rds"))
+}
 
 
 
-#### Continue...
+#### Compute whittaker smoother
+if(test = TRUE){
+  ndvi_oc_rst= readRDS(file = paste0(path_rdata, "data_small_test_02_ndvi_oc_rst.rds"))
+  outfiles = readRDS(paste0(path_rdata, "data_small_test_02_outfiles.rds"))
+}
+wfiles = outfiles
+
+outfiles = compileOutFilePath(input_filepath = outfiles,
+                              output_subdirectory = subpath_modis_outlier_checked,
+                              prefix=NA, suffix="ws")
+
+whittakerSmoother(vi = ndvi_oc_rst, names_vi = wfiles,
+                              pos1=10, pos2=16,
+                              begin="2002185", end="2017345",
+                              quality_stck=NULL,
+                              doy_stck=NULL,
+                              outfilepath = outfiles,
+                              lambda = 6000, nIter = 3, threshold = 2000)
+
+if(test = TRUE){
+  ndvi_ws_files = list.files(paste0(act_tile_path, "/", subpath_modis_whittaker_smoothed),
+                             pattern = glob2rx("*.tif"), full.names = TRUE)
+  ndvi_ws_rst = stack(ndvi_ws_files)
+  checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
+  saveRDS(ndvi_ws_rst, file = paste0(path_rdata, "/data_small_test_03_ndvi_ws_rst.rds"))
+  saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_03_outfiles.rds"))
+}
+
+
+
+
+#### Scale raster
+if(test = TRUE){
+  ndvi_ws_rst = readRDS(file = paste0(path_rdata, "/data_small_test_03_ndvi_ws_rst.rds"))
+  outfiles = readRDS(paste0(path_rdata, "/data_small_test_03_outfiles.rds"))
+}
+
+outfiles = compileOutFilePath(input_filepath = outfiles,
+                              output_subdirectory = subpath_modis_scaled,
+                              prefix=NA, suffix="sc")
+
+ndvi_sc_rst = scaleRaster(rstck = ndvi_ws_rst, outputfilepathes = outfiles)
+
+
+if(test = TRUE){
+  checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
+  saveRDS(ndvi_sc_rst, file = paste0(path_rdata, "/data_small_test_04_ndvi_sc_rst.rds"))
+  saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_04_outfiles.rds"))
+}
+
+
+#### temporalAggregation ####
+
+
+
+if(test = TRUE){
+  ndvi_ta_files = list.files(paste0(act_tile_path, "/", subpath_modis_temporal_aggregated),
+                             pattern = glob2rx("*.tif"), full.names = TRUE)
+  ndvi_ta_rst = stack(ndvi_ta_files)
+  checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
+  saveRDS(ndvi_ta_rst, file = paste0(path_rdata, "/data_small_test_05_ndvi_ta_rst.rds"))
+  saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_05_outfiles.rds"))
+}
+
+
+
+#### Fill gaps
+if(test){
+  ndvi_ta_rst = readRDS(paste0(path_rdata, "/data_small_test_05_ndvi_ta_rst.rds"))
+  outfiles = readRDS(paste0(path_rdata, "/data_small_test_05_outfiles.rds"))
+}
+
+outfiles = compileOutFilePath(input_filepath = outfiles,
+                              output_subdirectory = subpath_modis_filled_timeseries,
+                              prefix=NA, suffix="ft")
+
+ndvi_ft_rst = fillGapsLin(ndvi_ta_rst, outfiles)
+
+
+if(test = TRUE){
+  checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
+  saveRDS(ndvi_ft_rst, file = paste0(path_rdata, "/data_small_test_06_ndvi_ft_rst.rds"))
+  saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_06_outfiles.rds"))
+}
+
+
+
+#### Deseason data
+if(test = TRUE){
+  ndvi_ft_rst = readRDS(file = paste0(path_rdata, "/data_small_test_06_ndvi_ft_rst.rds"))
+  outfiles = readRDS(file = paste0(path_rdata, "/data_small_test_06_outfiles.rds"))
+}
+
+outfiles = compileOutFilePath(input_filepath = outfiles,
+                              output_subdirectory = subpath_modis_deseasoned,
+                              prefix=NA, suffix="ds")
+
+start = grep("2003001", basename(outfiles))
+end = grep("2017001", basename(outfiles))-1
+outfiles = outfiles[start:end]
+
+ndvi_ds_rst = beechForestDynamics::deseason(rstack = ndvi_ft_rst[[start:end]], outFilePath = outfiles, cycle.window = 24L)
+
+
+if(test = TRUE){
+  checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
+  saveRDS(ndvi_ds_rst, file = paste0(path_rdata, "/data_small_test_07_ndvi_ds_rst.rds"))
+  saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_07_outfiles.rds"))
+}
+
+
+
+#### Mann-Kendall trend
+if(test = TRUE){
+  ndvi_ds_rst = readRDS(file = paste0(path_rdata, "/data_small_test_07_ndvi_ds_rst.rds"))
+  outfiles = readRDS(file = paste0(path_rdata, "/data_small_test_07_outfiles.rds"))
+}
+
+mkoutput = compileOutFilePath(input_filepath = outfiles,
+                              output_subdirectory = subpath_modis_deseasoned,
+                              prefix=NA, suffix="ds")
+
+mkoutfile = paste0(basename(mkoutput[1]), "_mk_0010")
+
+mkoutfile = paste0(dirname(mkoutput[1]),
+                   substr(mkoutfile, 1, 16),
+                   substr(basename(mkoutput[length(mkoutput)]), 8, 16),
+                   substr(mkoutfile, 17, nchar(mkoutfile)))
+
+ndvi_mk_rst = mkTrend(input = ndvi_ds_rst, p = 0.01, prewhitening = TRUE, method = "yuepilon",
+                      filename = mkoutfile)
+
+if(test = TRUE){
+  checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
+  saveRDS(ndvi_mk_rst, file = paste0(path_rdata, "/data_small_test_08_ndvi_mk_rst.rds"))
+  saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_08_outfiles.rds"))
+}
 
 
 # } This is the end of the loop over all tile folders
