@@ -179,6 +179,10 @@ if(test = TRUE){
 
 
 
+
+
+
+
 if(test = TRUE){
   ndvi_ta_files = list.files(paste0(act_tile_path, "/", subpath_modis_temporal_aggregated),
                              pattern = glob2rx("*.tif"), full.names = TRUE)
