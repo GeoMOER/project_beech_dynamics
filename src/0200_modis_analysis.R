@@ -89,7 +89,7 @@ ndvi_qc_rst = qualityCheck(rstck_values = ndvi_rst,
                            rstck_quality = reliability_rst,
                            outputfilepathes = outfiles)
 
-checkResults (file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
+checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
 
 #### Compute outlier check for NDVI data
 # Load data from disk or use stack from step above
