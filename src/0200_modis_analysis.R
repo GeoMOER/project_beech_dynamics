@@ -307,10 +307,11 @@ ndvi_mk_rst = mkTrend(input = ndvi_ds_rst, p = 0.01, prewhitening = TRUE, method
                       filename = mkoutfile)
 
 if(test == TRUE){
-  checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
+  checkResults(file = mkoutfile, subpath_file = "data_small_test", subpath_test = "data_small")
   saveRDS(ndvi_mk_rst, file = paste0(path_rdata, "/data_small_test_08_ndvi_mk_rst.rds"))
   saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_08_outfiles.rds"))
 }
+
 
 
 # } This is the end of the loop over all tile folders
