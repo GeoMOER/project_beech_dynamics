@@ -75,6 +75,11 @@ act_tile_path = tilepathes[1] # will be replaced by the loop later
 
 
 #### Compute quality check for NDVI data
+if(length(showConnections()) == 0){
+  cl = parallel::makeCluster(cores)
+  doParallel::registerDoParallel(cl)
+}
+
 ndvi_files = list.files(paste0(act_tile_path, "/", subpath_modis_ndvi),
                         pattern = glob2rx("*.tif"), full.names = TRUE)
 ndvi_rst = raster::stack(ndvi_files)
@@ -108,6 +113,10 @@ if(test = TRUE){
   # ndvi_qc_rst = stack(ndvi_qc_files)
   # outfiles = ndvi_qc_files
 }
+if(length(showConnections()) == 0){
+  cl = parallel::makeCluster(cores)
+  doParallel::registerDoParallel(cl)
+}
 outfiles = compileOutFilePath(input_filepath = outfiles,
                               output_subdirectory = subpath_modis_outlier_checked,
                               prefix=NA, suffix="oc")
@@ -126,32 +135,33 @@ if(test = TRUE){
 
 #### Compute whittaker smoother
 if(test = TRUE){
-  ndvi_oc_rst= readRDS(file = paste0(path_rdata, "data_small_test_02_ndvi_oc_rst.rds"))
-  outfiles = readRDS(paste0(path_rdata, "data_small_test_02_outfiles.rds"))
+  ndvi_oc_rst= readRDS(file = paste0(path_rdata, "/data_small_test_02_ndvi_oc_rst.rds"))
+  outfiles = readRDS(paste0(path_rdata, "/data_small_test_02_outfiles.rds"))
+}
+if(length(showConnections()) == 0){
+  cl = parallel::makeCluster(cores)
+  doParallel::registerDoParallel(cl)
 }
 wfiles = outfiles
 
 outfiles = compileOutFilePath(input_filepath = outfiles,
-                              output_subdirectory = subpath_modis_outlier_checked,
+                              output_subdirectory = subpath_modis_whittaker_smoothed,
                               prefix=NA, suffix="ws")
 
-whittakerSmoother(vi = ndvi_oc_rst, names_vi = wfiles,
-                  pos1=10, pos2=16,
-                  begin="2002185", end="2017345",
-                  quality_stck=NULL,
-                  doy_stck=NULL,
-                  outfilepath = outfiles,
-                  lambda = 6000, nIter = 3, threshold = 2000, pillow = 0)
+ndvi_ws_rst = whittakerSmoother(vi = ndvi_oc_rst, names_vi = wfiles,
+                                pos1=10, pos2=16,
+                                begin="2002185", end="2017345",
+                                quality_stck=NULL,
+                                doy_stck=NULL,
+                                prefixSuffix = c("MYD13Q1", substr(basename(outfiles[1]), 18, (nchar(basename(outfiles[1]))-4))),
+                                outfilepath = paste0(dirname(outfiles[1]), "/"),
+                                lambda = 6000, nIter = 3, threshold = 2000, pillow = 0)
 
 if(test = TRUE){
-  ndvi_ws_files = list.files(paste0(act_tile_path, "/", subpath_modis_whittaker_smoothed),
-                             pattern = glob2rx("*.tif"), full.names = TRUE)
-  ndvi_ws_rst = stack(ndvi_ws_files)
   checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
   saveRDS(ndvi_ws_rst, file = paste0(path_rdata, "/data_small_test_03_ndvi_ws_rst.rds"))
   saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_03_outfiles.rds"))
 }
-
 
 
 
@@ -160,12 +170,16 @@ if(test = TRUE){
   ndvi_ws_rst = readRDS(file = paste0(path_rdata, "/data_small_test_03_ndvi_ws_rst.rds"))
   outfiles = readRDS(paste0(path_rdata, "/data_small_test_03_outfiles.rds"))
 }
-
+if(length(showConnections()) == 0){
+  cl = parallel::makeCluster(cores)
+  doParallel::registerDoParallel(cl)
+}
 outfiles = compileOutFilePath(input_filepath = outfiles,
                               output_subdirectory = subpath_modis_scaled,
                               prefix=NA, suffix="sc")
 
-ndvi_sc_rst = scaleRaster(rstck = ndvi_ws_rst, outputfilepathes = outfiles)
+ndvi_sc_rst = scaleRaster(rstck = ndvi_ws_rst,  scalefac = 10000,
+                          outputfilepathes = outfiles)
 
 
 if(test = TRUE){
@@ -176,17 +190,34 @@ if(test = TRUE){
 
 
 #### temporalAggregation ####
+if(test = TRUE){
+  ndvi_sc_rst = readRDS(paste0(path_rdata, "/data_small_test_04_ndvi_sc_rst.rds"))
+  outfiles = readRDS(paste0(path_rdata, "/data_small_test_04_outfiles.rds"))
+}
+if(length(showConnections()) == 0){
+  cl = parallel::makeCluster(cores)
+  doParallel::registerDoParallel(cl)
+}
 
+doy_fs = list.files(paste0(act_tile_path, subpath_modis_doy),
+                    pattern = glob2rx("*.tif"), full.names = TRUE)
 
+start = which(substr(basename(doy_fs), 10, 16) %in% substr(names(ndvi_sc_rst)[1], 10, 16))
+end = which(substr(basename(doy_fs), 10, 16) %in% substr(names(ndvi_sc_rst)[nlayers(ndvi_sc_rst)], 10, 16))
 
+doy_rst = stack(doy_fs[start:end])
 
+outfiles = compileOutFilePath(input_filepath = outfiles,
+                              output_subdirectory = subpath_modis_filled_timeseries,
+                              prefix=NA, suffix="ta")
 
-
+ndvi_ta_rst = temporalAggregation(rstack = ndvi_sc_rst, rstack_doy = doy_rst,
+                                  pos1 = 10, pos2 = 16,
+                                  outputfilepathes = outfiles,
+                                  interval = "fortnight", fun = max, na.rm = TRUE,
+                                  cores = cores)
 
 if(test = TRUE){
-  ndvi_ta_files = list.files(paste0(act_tile_path, "/", subpath_modis_temporal_aggregated),
-                             pattern = glob2rx("*.tif"), full.names = TRUE)
-  ndvi_ta_rst = stack(ndvi_ta_files)
   checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
   saveRDS(ndvi_ta_rst, file = paste0(path_rdata, "/data_small_test_05_ndvi_ta_rst.rds"))
   saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_05_outfiles.rds"))
@@ -198,6 +229,10 @@ if(test = TRUE){
 if(test){
   ndvi_ta_rst = readRDS(paste0(path_rdata, "/data_small_test_05_ndvi_ta_rst.rds"))
   outfiles = readRDS(paste0(path_rdata, "/data_small_test_05_outfiles.rds"))
+}
+if(length(showConnections()) == 0){
+  cl = parallel::makeCluster(cores)
+  doParallel::registerDoParallel(cl)
 }
 
 outfiles = compileOutFilePath(input_filepath = outfiles,
@@ -219,6 +254,10 @@ if(test = TRUE){
 if(test = TRUE){
   ndvi_ft_rst = readRDS(file = paste0(path_rdata, "/data_small_test_06_ndvi_ft_rst.rds"))
   outfiles = readRDS(file = paste0(path_rdata, "/data_small_test_06_outfiles.rds"))
+}
+if(length(showConnections()) == 0){
+  cl = parallel::makeCluster(cores)
+  doParallel::registerDoParallel(cl)
 }
 
 outfiles = compileOutFilePath(input_filepath = outfiles,
@@ -244,6 +283,10 @@ if(test = TRUE){
 if(test = TRUE){
   ndvi_ds_rst = readRDS(file = paste0(path_rdata, "/data_small_test_07_ndvi_ds_rst.rds"))
   outfiles = readRDS(file = paste0(path_rdata, "/data_small_test_07_outfiles.rds"))
+}
+if(length(showConnections()) == 0){
+  cl = parallel::makeCluster(cores)
+  doParallel::registerDoParallel(cl)
 }
 
 mkoutput = compileOutFilePath(input_filepath = outfiles,
