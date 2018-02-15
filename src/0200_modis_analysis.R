@@ -96,7 +96,7 @@ ndvi_qc_rst = qualityCheck(rstck_values = ndvi_rst,
                            rstck_quality = reliability_rst,
                            outputfilepathes = outfiles)
 
-if(test = TRUE){
+if(test == TRUE){
   checkResults(file = outfiles[1], subpath_file = "/data_small_test", subpath_test = "/data_small")
   saveRDS(ndvi_qc_rst, file = paste0(path_rdata, "/data_small_test_01_ndvi_qc_rst.rds"))
   saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_01_outfiles.rds"))
@@ -104,7 +104,7 @@ if(test = TRUE){
 
 
 #### Compute outlier check for NDVI data
-if(test = TRUE){
+if(test == TRUE){
   ndvi_qc_rst = readRDS(paste0(path_rdata, "/data_small_test_01_ndvi_qc_rst.rds"))
   outfiles = readRDS(paste0(path_rdata, "/data_small_test_01_outfiles.rds"))
   # Alternative
@@ -125,7 +125,7 @@ ndvi_oc_rst = outlierCheck(rstack = ndvi_qc_rst, outfilepathes = outfiles,
                            lq=0.4, uq=0.9)
 
 
-if(test = TRUE){
+if(test == TRUE){
   checkResults(file = outfiles[1], subpath_file = "/data_small_test", subpath_test = "/data_small")
   saveRDS(ndvi_oc_rst, file = paste0(path_rdata, "/data_small_test_02_ndvi_oc_rst.rds"))
   saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_02_outfiles.rds"))
@@ -134,7 +134,7 @@ if(test = TRUE){
 
 
 #### Compute whittaker smoother
-if(test = TRUE){
+if(test == TRUE){
   ndvi_oc_rst= readRDS(file = paste0(path_rdata, "/data_small_test_02_ndvi_oc_rst.rds"))
   outfiles = readRDS(paste0(path_rdata, "/data_small_test_02_outfiles.rds"))
 }
@@ -157,7 +157,7 @@ ndvi_ws_rst = whittakerSmoother(vi = ndvi_oc_rst, names_vi = wfiles,
                                 outfilepath = paste0(dirname(outfiles[1]), "/"),
                                 lambda = 6000, nIter = 3, threshold = 2000, pillow = 0)
 
-if(test = TRUE){
+if(test == TRUE){
   checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
   saveRDS(ndvi_ws_rst, file = paste0(path_rdata, "/data_small_test_03_ndvi_ws_rst.rds"))
   saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_03_outfiles.rds"))
@@ -166,7 +166,7 @@ if(test = TRUE){
 
 
 #### Scale raster
-if(test = TRUE){
+if(test == TRUE){
   ndvi_ws_rst = readRDS(file = paste0(path_rdata, "/data_small_test_03_ndvi_ws_rst.rds"))
   outfiles = readRDS(paste0(path_rdata, "/data_small_test_03_outfiles.rds"))
 }
@@ -182,7 +182,7 @@ ndvi_sc_rst = scaleRaster(rstck = ndvi_ws_rst,  scalefac = 10000,
                           outputfilepathes = outfiles)
 
 
-if(test = TRUE){
+if(test == TRUE){
   checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
   saveRDS(ndvi_sc_rst, file = paste0(path_rdata, "/data_small_test_04_ndvi_sc_rst.rds"))
   saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_04_outfiles.rds"))
@@ -190,7 +190,7 @@ if(test = TRUE){
 
 
 #### temporalAggregation ####
-if(test = TRUE){
+if(test == TRUE){
   ndvi_sc_rst = readRDS(paste0(path_rdata, "/data_small_test_04_ndvi_sc_rst.rds"))
   outfiles = readRDS(paste0(path_rdata, "/data_small_test_04_outfiles.rds"))
 }
@@ -217,7 +217,7 @@ ndvi_ta_rst = temporalAggregation(rstack = ndvi_sc_rst, rstack_doy = doy_rst,
                                   interval = "fortnight", fun = max, na.rm = TRUE,
                                   cores = cores)
 
-if(test = TRUE){
+if(test == TRUE){
   checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
   saveRDS(ndvi_ta_rst, file = paste0(path_rdata, "/data_small_test_05_ndvi_ta_rst.rds"))
   saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_05_outfiles.rds"))
@@ -242,7 +242,7 @@ outfiles = compileOutFilePath(input_filepath = outfiles,
 ndvi_ft_rst = fillGapsLin(ndvi_ta_rst, outfiles)
 
 
-if(test = TRUE){
+if(test == TRUE){
   checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
   saveRDS(ndvi_ft_rst, file = paste0(path_rdata, "/data_small_test_06_ndvi_ft_rst.rds"))
   saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_06_outfiles.rds"))
@@ -251,7 +251,7 @@ if(test = TRUE){
 
 
 #### Deseason data
-if(test = TRUE){
+if(test == TRUE){
   ndvi_ft_rst = readRDS(file = paste0(path_rdata, "/data_small_test_06_ndvi_ft_rst.rds"))
   outfiles = readRDS(file = paste0(path_rdata, "/data_small_test_06_outfiles.rds"))
 }
@@ -271,7 +271,7 @@ outfiles = outfiles[start:end]
 ndvi_ds_rst = beechForestDynamics::deseason(rstack = ndvi_ft_rst[[start:end]], outFilePath = outfiles, cycle.window = 24L)
 
 
-if(test = TRUE){
+if(test == TRUE){
   checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
   saveRDS(ndvi_ds_rst, file = paste0(path_rdata, "/data_small_test_07_ndvi_ds_rst.rds"))
   saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_07_outfiles.rds"))
@@ -280,7 +280,7 @@ if(test = TRUE){
 
 
 #### Mann-Kendall trend
-if(test = TRUE){
+if(test == TRUE){
   ndvi_ds_rst = readRDS(file = paste0(path_rdata, "/data_small_test_07_ndvi_ds_rst.rds"))
   outfiles = readRDS(file = paste0(path_rdata, "/data_small_test_07_outfiles.rds"))
 }
@@ -303,7 +303,7 @@ mkoutfile = paste0(dirname(mkoutput[1]),
 ndvi_mk_rst = mkTrend(input = ndvi_ds_rst, p = 0.01, prewhitening = TRUE, method = "yuepilon",
                       filename = mkoutfile)
 
-if(test = TRUE){
+if(test == TRUE){
   checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
   saveRDS(ndvi_mk_rst, file = paste0(path_rdata, "/data_small_test_08_ndvi_mk_rst.rds"))
   saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_08_outfiles.rds"))
