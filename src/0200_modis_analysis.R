@@ -208,7 +208,7 @@ end = which(substr(basename(doy_fs), 10, 16) %in% substr(names(ndvi_sc_rst)[nlay
 doy_rst = stack(doy_fs[start:end])
 
 outfiles = compileOutFilePath(input_filepath = outfiles,
-                              output_subdirectory = subpath_modis_filled_timeseries,
+                              output_subdirectory = subpath_modis_temporal_aggregated,
                               prefix=NA, suffix="ta")
 
 ndvi_ta_rst = temporalAggregation(rstack = ndvi_sc_rst, rstack_doy = doy_rst,
@@ -217,12 +217,13 @@ ndvi_ta_rst = temporalAggregation(rstack = ndvi_sc_rst, rstack_doy = doy_rst,
                                   interval = "fortnight", fun = max, na.rm = TRUE,
                                   cores = cores)
 
+outfiles = paste0(dirname(outfiles[1]), "/", names(ndvi_ta_rst))
+
 if(test = TRUE){
   checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
   saveRDS(ndvi_ta_rst, file = paste0(path_rdata, "/data_small_test_05_ndvi_ta_rst.rds"))
   saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_05_outfiles.rds"))
 }
-
 
 
 #### Fill gaps
