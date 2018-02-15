@@ -208,7 +208,7 @@ end = which(substr(basename(doy_fs), 10, 16) %in% substr(names(ndvi_sc_rst)[nlay
 doy_rst = stack(doy_fs[start:end])
 
 outfiles = compileOutFilePath(input_filepath = outfiles,
-                              output_subdirectory = subpath_modis_filled_timeseries,
+                              output_subdirectory = subpath_modis_temporal_aggregated,
                               prefix=NA, suffix="ta")
 
 ndvi_ta_rst = temporalAggregation(rstack = ndvi_sc_rst, rstack_doy = doy_rst,
@@ -216,6 +216,9 @@ ndvi_ta_rst = temporalAggregation(rstack = ndvi_sc_rst, rstack_doy = doy_rst,
                                   outputfilepathes = outfiles,
                                   interval = "fortnight", fun = max, na.rm = TRUE,
                                   cores = cores)
+
+
+outfiles = paste0(dirname(outfiles), "/", names(ndvi_ta_rst))
 
 if(test == TRUE){
   checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
@@ -290,12 +293,12 @@ if(length(showConnections()) == 0){
 }
 
 mkoutput = compileOutFilePath(input_filepath = outfiles,
-                              output_subdirectory = subpath_modis_deseasoned,
-                              prefix=NA, suffix="ds")
+                              output_subdirectory = subpath_modis_mktrend,
+                              prefix=NA, suffix="mk")
 
-mkoutfile = paste0(basename(mkoutput[1]), "_mk_0010")
+mkoutfile = paste0(basename(substr(mkoutput[1], 1, nchar(mkoutput[1])-4)), "_0010.tif")
 
-mkoutfile = paste0(dirname(mkoutput[1]),
+mkoutfile = paste0(dirname(mkoutput[1]), "/",
                    substr(mkoutfile, 1, 16),
                    substr(basename(mkoutput[length(mkoutput)]), 8, 16),
                    substr(mkoutfile, 17, nchar(mkoutfile)))
