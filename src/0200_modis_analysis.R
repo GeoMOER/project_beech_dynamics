@@ -26,51 +26,55 @@
 #'                                              |-...
 #'                                   |-...
 #'
-
+rm(list=ls())
 # Load environment
 # source("E:/modis_carpathian_mountains/src/00_set_environment.R")
 # source("/mnt/sd19006/data/processing_data/modis_carpathian_mountains/src/00_set_environment.R")
-source("C:/Users/tnauss/permanent/edu/msc-phygeo-environmental-observations/git/project_beech_dynamics/src/00_set_environment.R")
+source("D:/BEN/ML/project_beech_dynamics/src/00_set_environment.R")
 lib = c("beechForestDynamics", "doParallel", "raster", "rgdal", "GSODTools")
 
 # Test run?
-test = TRUE
+test = F
 
 # Define parallelization information
-cores = 3
+library(parallel)
+detectCores()
+cores = 7
 cl = parallel::makeCluster(cores)
 doParallel::registerDoParallel(cl)
 
 
 #### Subset MODIS into tiles
-if (!dir.exists(path_modis_tiles))
-  dir.create(path_modis_tiles, recursive = TRUE)
+# if (!dir.exists(path_modis_tiles))
+#   dir.create(path_modis_tiles, recursive = TRUE)
+# 
+# p = c("NDVI.tif$")
+# ndvi_rst = raster::stack(list.files(path_modis_prj, pattern = p, full.names = TRUE))
+# tileRaster(raster = ndvi_rst, tilenbr = c(12,10), overlap = 10,
+#            outpath = path_modis_tiles, subpath = subpath_modis_ndvi)
+# 
+# p = c("composite_day_of_the_year.tif$")
+# doy_rst = raster::stack(list.files(path_modis_prj, pattern = p, full.names = TRUE))
+# tileRaster(raster = doy_rst, tilenbr = c(12,10), overlap = 10,
+#            outpath = path_modis_tiles, subpath = subpath_modis_doy)
+# 
+# p = c("Quality.tif$")
+# qlt_rst = raster::stack(list.files(path_modis_prj, pattern = p, full.names = TRUE))
+# tileRaster(raster = qlt_rst, tilenbr = c(12,10), overlap = 10,
+#            outpath = path_modis_tiles, subpath = subpath_modis_quality)
+# 
+# p = c("reliability.tif$")
+# rlb_rst = raster::stack(list.files(path_modis_prj, pattern = p, full.names = TRUE))
+# tileRaster(raster = rlb_rst, tilenbr = c(12,10), overlap = 10,
+#            outpath = path_modis_tiles, subpath = subpath_modis_reliability)
 
-p = c("NDVI.tif$")
-ndvi_rst = raster::stack(list.files(path_modis_prj, pattern = p, full.names = TRUE))
-tileRaster(raster = ndvi_rst, tilenbr = c(12,10), overlap = 10,
-           outpath = path_modis_tiles, subpath = subpath_modis_ndvi)
 
-p = c("composite_day_of_the_year.tif$")
-doy_rst = raster::stack(list.files(path_modis_prj, pattern = p, full.names = TRUE))
-tileRaster(raster = doy_rst, tilenbr = c(12,10), overlap = 10,
-           outpath = path_modis_tiles, subpath = subpath_modis_doy)
-
-p = c("Quality.tif$")
-qlt_rst = raster::stack(list.files(path_modis_prj, pattern = p, full.names = TRUE))
-tileRaster(raster = qlt_rst, tilenbr = c(12,10), overlap = 10,
-           outpath = path_modis_tiles, subpath = subpath_modis_quality)
-
-p = c("reliability.tif$")
-rlb_rst = raster::stack(list.files(path_modis_prj, pattern = p, full.names = TRUE))
-tileRaster(raster = rlb_rst, tilenbr = c(12,10), overlap = 10,
-           outpath = path_modis_tiles, subpath = subpath_modis_reliability)
 
 
 #### Start loop
-tilepathes = list.dirs(path_modis_tiles, recursive = FALSE)
+tilepathes = list.dirs(path_modis_tiles)[-1]
 act_tile_path = tilepathes[1] # will be replaced by the loop later
-# for(act_tile_path in tilepathes){
+# for(act_tile_path in tilepathes){ This is the star of the loop over all tile folders
 
 
 
@@ -87,7 +91,7 @@ ndvi_rst = raster::stack(ndvi_files)
 reliability_files = list.files(paste0(act_tile_path, "/", subpath_modis_reliability),
                                pattern = glob2rx("*.tif"), full.names = TRUE)
 reliability_rst = raster::stack(reliability_files)
-
+#devtools::install_github("marburg-open-courseware/beechForestDynamics")
 outfiles = compileOutFilePath(input_filepath = ndvi_files,
                               output_subdirectory = subpath_modis_quality_checked,
                               prefix=NA, suffix="qc")
@@ -97,9 +101,9 @@ ndvi_qc_rst = qualityCheck(rstck_values = ndvi_rst,
                            outputfilepathes = outfiles)
 
 if(test == TRUE){
-  checkResults(file = outfiles[1], subpath_file = "/data_small_test", subpath_test = "/data_small")
-  saveRDS(ndvi_qc_rst, file = paste0(path_rdata, "/data_small_test_01_ndvi_qc_rst.rds"))
-  saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_01_outfiles.rds"))
+checkResults(file = outfiles[1], subpath_file = "/data_small_test", subpath_test = "/data_small")
+saveRDS(ndvi_qc_rst, file = paste0(path_rdata, "/data_small_test_01_ndvi_qc_rst.rds"))
+saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_01_outfiles.rds"))
 }
 
 
@@ -126,9 +130,9 @@ ndvi_oc_rst = outlierCheck(rstack = ndvi_qc_rst, outfilepathes = outfiles,
 
 
 if(test == TRUE){
-  checkResults(file = outfiles[1], subpath_file = "/data_small_test", subpath_test = "/data_small")
-  saveRDS(ndvi_oc_rst, file = paste0(path_rdata, "/data_small_test_02_ndvi_oc_rst.rds"))
-  saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_02_outfiles.rds"))
+ checkResults(file = outfiles[1], subpath_file = "/data_small_test", subpath_test = "/data_small")
+saveRDS(ndvi_oc_rst, file = paste0(path_rdata, "/data_small_test_02_ndvi_oc_rst.rds"))
+ saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_02_outfiles.rds"))
 }
 
 
@@ -142,7 +146,6 @@ if(length(showConnections()) == 0){
   cl = parallel::makeCluster(cores)
   doParallel::registerDoParallel(cl)
 }
-
 wfiles = outfiles
 
 outfiles = compileOutFilePath(input_filepath = outfiles,
@@ -160,14 +163,14 @@ ndvi_ws_rst = whittakerSmoother(vi = ndvi_oc_rst, names_vi = wfiles,
                                 cores = cores)
 
 if(test == TRUE){
-  checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
-  saveRDS(ndvi_ws_rst, file = paste0(path_rdata, "/data_small_test_03_ndvi_ws_rst.rds"))
-  saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_03_outfiles.rds"))
+ checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
+ saveRDS(ndvi_ws_rst, file = paste0(path_rdata, "/data_small_test_03_ndvi_ws_rst.rds"))
+ saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_03_outfiles.rds"))
 }
 
 
 
-#### Scale raster
+# #### Scale raster
 if(test == TRUE){
   ndvi_ws_rst = readRDS(file = paste0(path_rdata, "/data_small_test_03_ndvi_ws_rst.rds"))
   outfiles = readRDS(paste0(path_rdata, "/data_small_test_03_outfiles.rds"))
@@ -185,9 +188,9 @@ ndvi_sc_rst = scaleRaster(rstck = ndvi_ws_rst,  scalefac = 10000,
 
 
 if(test == TRUE){
-  checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
-  saveRDS(ndvi_sc_rst, file = paste0(path_rdata, "/data_small_test_04_ndvi_sc_rst.rds"))
-  saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_04_outfiles.rds"))
+checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
+ saveRDS(ndvi_sc_rst, file = paste0(path_rdata, "/data_small_test_04_ndvi_sc_rst.rds"))
+ saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_04_outfiles.rds"))
 }
 
 
@@ -213,21 +216,20 @@ outfiles = compileOutFilePath(input_filepath = outfiles,
                               output_subdirectory = subpath_modis_temporal_aggregated,
                               prefix=NA, suffix="ta")
 
+
 ndvi_ta_rst = temporalAggregation(rstack = ndvi_sc_rst, rstack_doy = doy_rst,
                                   pos1 = 10, pos2 = 16,
                                   outputfilepathes = outfiles,
                                   interval = "fortnight", fun = max, na.rm = TRUE,
                                   cores = cores)
 
-
 outfiles = paste0(dirname(outfiles), "/", names(ndvi_ta_rst))
 
-if(test == TRUE){
-  checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
-  saveRDS(ndvi_ta_rst, file = paste0(path_rdata, "/data_small_test_05_ndvi_ta_rst.rds"))
-  saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_05_outfiles.rds"))
-}
-
+ if(test == TRUE){
+   checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
+   saveRDS(ndvi_ta_rst, file = paste0(path_rdata, "/data_small_test_05_ndvi_ta_rst.rds"))
+   saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_05_outfiles.rds"))
+ }
 
 
 #### Fill gaps
@@ -235,6 +237,7 @@ if(test){
   ndvi_ta_rst = readRDS(paste0(path_rdata, "/data_small_test_05_ndvi_ta_rst.rds"))
   outfiles = readRDS(paste0(path_rdata, "/data_small_test_05_outfiles.rds"))
 }
+
 if(length(showConnections()) == 0){
   cl = parallel::makeCluster(cores)
   doParallel::registerDoParallel(cl)
@@ -243,12 +246,12 @@ if(length(showConnections()) == 0){
 outfiles = compileOutFilePath(input_filepath = outfiles,
                               output_subdirectory = subpath_modis_filled_timeseries,
                               prefix=NA, suffix="ft")
-
+ 
 ndvi_ft_rst = fillGapsLin(ndvi_ta_rst, outfiles)
 
 
 if(test == TRUE){
-  checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
+ checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
   saveRDS(ndvi_ft_rst, file = paste0(path_rdata, "/data_small_test_06_ndvi_ft_rst.rds"))
   saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_06_outfiles.rds"))
 }
@@ -277,7 +280,7 @@ ndvi_ds_rst = beechForestDynamics::deseason(rstack = ndvi_ft_rst[[start:end]], o
 
 
 if(test == TRUE){
-  checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
+ checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
   saveRDS(ndvi_ds_rst, file = paste0(path_rdata, "/data_small_test_07_ndvi_ds_rst.rds"))
   saveRDS(outfiles, file = paste0(path_rdata, "/data_small_test_07_outfiles.rds"))
 }
@@ -315,11 +318,10 @@ if(test == TRUE){
 }
 
 
+# } This is the end of the loop over all tile folders
 
-# }
 
-
-###flexTimeAggStack
+#### flexTimeAggStack ####
 if(length(showConnections()) == 0){
   cl = parallel::makeCluster(cores)
   doParallel::registerDoParallel(cl)
@@ -331,11 +333,33 @@ dates_path <- list.files(paste0(act_tile_path, subpath_modis_temporal_aggregated
 
 dates=substr(basename(dates_path),10,16)
 
-flexTimeAggStack(beginnzeitsp = 2002, endzeitsp = 2003, dates_path = dates, aggrdata = mswep_files, a=1, b=4, c=5, d=7,
-             outfilepath = path_output, edit="kap")
+flexTimeAggStack(beginnzeitsp = 2002, endzeitsp = 2003, dates_path = dates, aggrdata = mswep_files, 
+                 outfilepath = path_output, edit="kap")
 
 
+#### Start loop ####
+tilepathes = list.dirs(path_modis_tiles)[-1]
+act_tile_path = tilepathes[1] # will be replaced by the loop later
+# for(act_tile_path in tilepathes){ This is the star of the loop over all tile folders
 
+
+#### spatialProjection ####
+if(length(showConnections()) == 0){
+  cl = parallel::makeCluster(cores)
+  doParallel::registerDoParallel(cl)
+}
+
+list_rst_from <- list.files(paste0(path_output), 
+                            pattern = glob2rx("*.tif"), full.names = TRUE)
+
+list_prst_to <- list.files(paste0(act_tile_path, subpath_modis_temporal_aggregated), 
+                           pattern = glob2rx("*.tif"), full.names = TRUE)
+
+spatialProjection(list_rst_from=list_rst_from, 
+                  list_prst_to=list_prst_to, 
+                  outfilepath=path_proj)
+
+# } This is the end of the loop over all tile folders
 
 if (cores > 1L)
   parallel::stopCluster(cl)
