@@ -331,7 +331,7 @@ dates_path <- list.files(paste0(act_tile_path, subpath_modis_temporal_aggregated
 
 dates=substr(basename(dates_path),10,16)
 
-flexTimeAggStack(beginnzeitsp = 2002, endzeitsp = 2003, dates_path = dates, aggrdata = mswep_files, a, b, c, d,
+flexTimeAggStack(beginnzeitsp = 2002, endzeitsp = 2003, dates_path = dates, aggrdata = mswep_files,
              outfilepath = path_output, edit="kap")
 
 
