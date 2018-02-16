@@ -155,7 +155,8 @@ ndvi_ws_rst = whittakerSmoother(vi = ndvi_oc_rst, names_vi = wfiles,
                                 doy_stck=NULL,
                                 prefixSuffix = c("MYD13Q1", substr(basename(outfiles[1]), 18, (nchar(basename(outfiles[1]))-4))),
                                 outfilepath = paste0(dirname(outfiles[1]), "/"),
-                                lambda = 6000, nIter = 3, threshold = 2000, pillow = 0)
+                                lambda = 6000, nIter = 3, threshold = 2000, pillow = 0,
+                                cores = cores)
 
 if(test == TRUE){
   checkResults(file = outfiles[1], subpath_file = "data_small_test", subpath_test = "data_small")
