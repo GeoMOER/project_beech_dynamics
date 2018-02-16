@@ -20,10 +20,9 @@ beginnzeitsp=2002
 
 
 
-temporalaggregation=function(beginnzeitsp,endzeitsp,dates_path,mswep_files,outfilepath){
+temporalaggregation=function(beginnzeitsp,endzeitsp,dates_path,mswep_files,outfilepath,edit=kap){
   foreach(j = seq(beginnzeitsp,endzeitsp), i = seq(1:(length(l)-1)))
     .packages = c("raster", "rgdal")
-    .packages()
     %dopar%{
       dates = substr(basename(list.files(path = dates_path, full.names = T)), 10, 16)
     lc = substr(dates[substr(dates, 1, 4) == j], 5, 7)
@@ -32,11 +31,11 @@ temporalaggregation=function(beginnzeitsp,endzeitsp,dates_path,mswep_files,outfi
     if ((i+1 > (length(l)-1))){
       stacklist=raster::stack(mswep_files[which(j == seq(beginnzeitsp,endzeitsp))])
       temp_agg = sum(stacklist[[(l[length(l)]+1):nlayers(stacklist)]])
-      raster::writeRaster(temp_agg, paste0(outfilepath, "MSWEP_karpaten_", j, lc[i+1], "_temporal_aggregated"),format="GTiff",overwrite=T)
+      raster::writeRaster(temp_agg, paste0(outfilepath, "MSWEP_",edit,"_", j, lc[i+1], "_temporal_aggregated"),format="GTiff",overwrite=T)
     } else {
       stacklist=raster::stack(mswep_files[which(j == seq(beginnzeitsp,endzeitsp))])
       temp_agg=sum(stacklist[[l[i]:(l[i+1]-1)]])
-      raster::writeRaster(temp_agg, paste0(outfilepath, "MSWEP_karpaten_", j, lc[i], "_temporal_aggregated"),format="GTiff",overwrite=T)
+      raster::writeRaster(temp_agg, paste0(outfilepath, "MSWEP_",edit,"_", j, lc[i], "_temporal_aggregated"),format="GTiff",overwrite=T)
       
     }}}
     
@@ -75,11 +74,16 @@ big_tile = raster(paste0(filepath_base, "/data/MYD13Q1.A2002185.250m_16_days_NDV
 #project
 #for all tiles (spacial) in study area and for all temporal aggregated rasters (temporal) do:
 
-spacialproject=function(rst_from,proj_to,outfilepath){
-  for (i in seq(1:length(ras_stack_mswep_tempAggregated))){
-    projectRaster(from=ras_stack_mswep_tempAggregated, to=trend_ndvi_output_ras_example,
+spacialproject=function(rst_from,prst_to,outfilepath){
+  for (i in seq(1:length(rst_from))){
+    mwesp_stck= raster::stack(rst_from[which(i==substr(basename(path = rst_from),10,13))])#aktuell 16,19
+    for (j in seq(1:length(prst_to)))
+    
+    proj_stck= raster::stack(prst_to[which(i==substr(basename(path = prst_to),10,13))])
+    
+    projectRaster(from=mwesp_stck, to=proj_stck,
                   method="bilinear", 
-                  filename="ras_mswep_tempAggregated_projected",format="GTiff", overwrite = T) 
+                  filename=outputfilepath,format="GTiff", overwrite = T) 
     
   }
 }
