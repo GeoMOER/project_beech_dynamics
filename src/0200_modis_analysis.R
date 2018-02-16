@@ -68,9 +68,9 @@ tileRaster(raster = rlb_rst, tilenbr = c(12,10), overlap = 10,
 
 
 #### Start loop
-tilepathes = list.dirs(path_modis_tiles)[-1]
+tilepathes = list.dirs(path_modis_tiles, recursive = FALSE)
 act_tile_path = tilepathes[1] # will be replaced by the loop later
-# for(act_tile_path in tilepathes){ This is the star of the loop over all tile folders
+# for(act_tile_path in tilepathes){
 
 
 
@@ -142,6 +142,7 @@ if(length(showConnections()) == 0){
   cl = parallel::makeCluster(cores)
   doParallel::registerDoParallel(cl)
 }
+
 wfiles = outfiles
 
 outfiles = compileOutFilePath(input_filepath = outfiles,
@@ -315,7 +316,7 @@ if(test == TRUE){
 
 
 
-# } This is the end of the loop over all tile folders
+# }
 
 if (cores > 1L)
   parallel::stopCluster(cl)
