@@ -318,5 +318,24 @@ if(test == TRUE){
 
 # }
 
+
+###flexTimeAggStack
+if(length(showConnections()) == 0){
+  cl = parallel::makeCluster(cores)
+  doParallel::registerDoParallel(cl)
+}
+mswep_files <- list.files(path_mswep, pattern = glob2rx("*.tif"), full.names = TRUE)
+
+dates_path <- list.files(paste0(act_tile_path, subpath_modis_temporal_aggregated), 
+                         pattern = glob2rx("*.tif"), full.names = TRUE)
+
+dates=substr(basename(dates_path),10,16)
+
+flexTimeAggStack(beginnzeitsp = 2002, endzeitsp = 2003, dates_path = dates, aggrdata = mswep_files, a, b, c, d,
+             outfilepath = path_output, edit="kap")
+
+
+
+
 if (cores > 1L)
   parallel::stopCluster(cl)
