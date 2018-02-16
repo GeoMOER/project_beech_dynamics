@@ -1,6 +1,6 @@
 # Set pathes -------------------------------------------------------------------
 if(Sys.info()["sysname"] == "Windows"){
-  filepath_base = "F:/Uni/EnvironmentalObservations/modis_carpathian_mountains"
+  filepath_base = "D:/BEN/ML"
 } else {
   filepath_base = "/mnt/sd19006/data/processing_data/modis_carpathian_mountains/data_small_test"
 }
@@ -37,14 +37,17 @@ path_temp = paste0(path_data, "/temp")
 path_output = paste0(path_data, "/output/")
 path_vectors = paste0(path_data, "/vectors")
 path_mswep = paste0(path_data, "/mswep")
+path_proj = paste0(path_data, "/projection/")
 
 
 # Set libraries ----------------------------------------------------------------
+library(beechForestDynamics)
 library(doParallel)
 library(GSODTools)
 library(gimms)
 library(rgeos)
 # library(mapview)
+# devtools::install_github("MatMatt/MODIS", ref = "develop")
 library(MODIS)
 # library(metTools)  # devtools::install_github("environmentalinformatics-marburg/metTools")
 library(raster)
