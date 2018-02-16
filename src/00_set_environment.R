@@ -34,8 +34,9 @@ subpath_modis_mktrend = "/modis_mktrend"
 # Path to results etc.
 path_rdata = paste0(path_data, "/rdata")
 path_temp = paste0(path_data, "/temp")
-path_output = paste0(path_data, "/output")
+path_output = paste0(path_data, "/output/")
 path_vectors = paste0(path_data, "/vectors")
+path_mswep = paste0(path_data, "/mswep")
 
 
 # Set libraries ----------------------------------------------------------------
