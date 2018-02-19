@@ -1,12 +1,12 @@
 # Set pathes -------------------------------------------------------------------
 if(Sys.info()["sysname"] == "Windows"){
-  filepath_base = "D:/BEN/ML"
+  filepath_base = "F:/modis_carpathian_mountains"
 } else {
   filepath_base = "/mnt/sd19006/data/processing_data/modis_carpathian_mountains/data_small_test"
 }
 
 # Basic data path
-path_data = paste0(filepath_base, "/data_small_test")
+path_data = paste0(filepath_base, "/data")
 
 # Path to original modis dataset
 path_modis = paste0(path_data, "/modis")
