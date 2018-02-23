@@ -37,36 +37,35 @@ lib = c("beechForestDynamics", "doParallel", "raster", "rgdal", "GSODTools")
 test = F
 
 # Define parallelization information
-library(parallel)
 detectCores()
-cores = 7
+cores = 2
 cl = parallel::makeCluster(cores)
 doParallel::registerDoParallel(cl)
 
 
 #### Subset MODIS into tiles
-# if (!dir.exists(path_modis_tiles))
-#   dir.create(path_modis_tiles, recursive = TRUE)
-# 
-# p = c("NDVI.tif$")
-# ndvi_rst = raster::stack(list.files(path_modis_prj, pattern = p, full.names = TRUE))
-# tileRaster(raster = ndvi_rst, tilenbr = c(12,10), overlap = 10,
-#            outpath = path_modis_tiles, subpath = subpath_modis_ndvi)
-# 
-# p = c("composite_day_of_the_year.tif$")
-# doy_rst = raster::stack(list.files(path_modis_prj, pattern = p, full.names = TRUE))
-# tileRaster(raster = doy_rst, tilenbr = c(12,10), overlap = 10,
-#            outpath = path_modis_tiles, subpath = subpath_modis_doy)
-# 
-# p = c("Quality.tif$")
-# qlt_rst = raster::stack(list.files(path_modis_prj, pattern = p, full.names = TRUE))
-# tileRaster(raster = qlt_rst, tilenbr = c(12,10), overlap = 10,
-#            outpath = path_modis_tiles, subpath = subpath_modis_quality)
-# 
-# p = c("reliability.tif$")
-# rlb_rst = raster::stack(list.files(path_modis_prj, pattern = p, full.names = TRUE))
-# tileRaster(raster = rlb_rst, tilenbr = c(12,10), overlap = 10,
-#            outpath = path_modis_tiles, subpath = subpath_modis_reliability)
+if (!dir.exists(path_modis_tiles))
+  dir.create(path_modis_tiles, recursive = TRUE)
+
+p = c("NDVI.tif$")
+ndvi_rst = raster::stack(list.files(path_modis_prj, pattern = p, full.names = TRUE))
+tileRaster(raster = ndvi_rst, tilenbr = c(12,10), overlap = 10,
+           outpath = path_modis_tiles, subpath = subpath_modis_ndvi)
+
+p = c("composite_day_of_the_year.tif$")
+doy_rst = raster::stack(list.files(path_modis_prj, pattern = p, full.names = TRUE))
+tileRaster(raster = doy_rst, tilenbr = c(12,10), overlap = 10,
+           outpath = path_modis_tiles, subpath = subpath_modis_doy)
+
+p = c("Quality.tif$")
+qlt_rst = raster::stack(list.files(path_modis_prj, pattern = p, full.names = TRUE))
+tileRaster(raster = qlt_rst, tilenbr = c(12,10), overlap = 10,
+           outpath = path_modis_tiles, subpath = subpath_modis_quality)
+
+p = c("reliability.tif$")
+rlb_rst = raster::stack(list.files(path_modis_prj, pattern = p, full.names = TRUE))
+tileRaster(raster = rlb_rst, tilenbr = c(12,10), overlap = 10,
+           outpath = path_modis_tiles, subpath = subpath_modis_reliability)
 
 
 
