@@ -35,6 +35,7 @@ subpath_modis_mktrend = "/modis_mktrend"
 path_modis_modis_filled_timeseries = paste0(path_modis, "/modis_filled_timeseries")
 path_modis_deseasoned = paste0(path_modis, "/modis_deseasoned")
 path_modis_mktrend = paste0(path_modis, "/modis_mktrend")
+path_modis_ndvi = paste0(path_modis, "/modis_ndvi")
 
 # Path to top-level study area directory
 path_study_area = paste0(path_data, "/study_area")
@@ -47,8 +48,8 @@ path_mswep_temporal_aggregated_modis = paste0(path_mswep, "/temporal_aggregated_
 
 # Path to Maryland
 path_maryland = paste0(path_data, "/maryland")
-path_maryland_org = ppaste0(path_maryland, "/org")
-path_maryland = paste0(path_maryland, "/maryland_modis_proj")
+path_maryland_org = paste0(path_maryland, "/org")
+path_maryland_modis = paste0(path_maryland, "/maryland_modis_proj")
 
 # Path to results etc.
 path_rdata = paste0(path_data, "/rdata")

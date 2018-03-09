@@ -1,0 +1,15 @@
+
+gdalwarp -overwrite -s_srs EPSG:4326 -t_srs target.wkt -r near -te 1566303.211 4884833.885 2154509.206 5320566.264 -of GTiff Hansen_GFC-2016-v1.4_first_50N_020E.tif Hansen_GFC-2016-v1.4_first_50N_020E_projection.tif
+
+gdalwarp -overwrite -s_srs EPSG:4326 -t_srs target.wkt -r near -te 1566303.211 4884833.885 2154509.206 5320566.264 -of GTiff Hansen_GFC-2016-v1.4_gain_50N_020E.tif Hansen_GFC-2016-v1.4_gain_50N_020E_projection.tif
+
+gdalwarp -overwrite -s_srs EPSG:4326 -t_srs target.wkt -r near -te 1566303.211 4884833.885 2154509.206 5320566.264 -of GTiff Hansen_GFC-2016-v1.4_last_50N_020E.tif Hansen_GFC-2016-v1.4_last_50N_020E_projection.tif
+
+gdalwarp -overwrite -s_srs EPSG:4326 -t_srs target.wkt -r near -te 1566303.211 4884833.885 2154509.206 5320566.264 -of GTiff Hansen_GFC-2016-v1.4_lossyear_50N_020E.tif Hansen_GFC-2016-v1.4_lossyear_50N_020E_projection.tif
+
+gdalwarp -overwrite -s_srs EPSG:4326 -t_srs target.wkt -r near -te 1566303.211 4884833.885 2154509.206 5320566.264 -of GTiff Hansen_GFC-2016-v1.4_treecover2000_50N_020E.tif Hansen_GFC-2016-v1.4_treecover2000_50N_020E_projection.tif
+
+gdalwarp -overwrite -s_srs EPSG:4326 -t_srs target.wkt -r near -te 1566303.211 4884833.885 2154509.206 5320566.264 -of GTiff Hansen_GFC-2016-v1.4_datamask_50N_020E.tif Hansen_GFC-2016-v1.4_datamask_50N_020E_projection.tif
+
+
+
