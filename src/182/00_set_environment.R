@@ -1,6 +1,6 @@
 # Set path ---------------------------------------------------------------------
 if(Sys.info()["sysname"] == "Windows"){
-  filepath_base = "F:/modis_carpathian_mountains/"
+  filepath_base = "E:/modis_carpathian_mountains/"
 } else {
   filepath_base = "/mnt/sd19006/data/processing_data/modis_carpathian_mountains/"
 }
@@ -31,31 +31,12 @@ subpath_modis_filled_timeseries = "/modis_filled_timeseries"
 subpath_modis_deseasoned = "/modis_deseasoned"
 subpath_modis_mktrend = "/modis_mktrend"
 
-# Path to spatially re-aggregated MODIS data
-path_modis_modis_filled_timeseries = paste0(path_modis, "/modis_filled_timeseries")
-path_modis_deseasoned = paste0(path_modis, "/modis_deseasoned")
-path_modis_mktrend = paste0(path_modis, "/modis_mktrend")
-path_modis_ndvi = paste0(path_modis, "/modis_ndvi")
-
-# Path to top-level study area directory
-path_study_area = paste0(path_data, "/study_area")
-
-# Path to rainfall
-path_mswep = paste0(path_data, "/mswep")
-path_mswep_org = paste0(path_mswep, "/org")
-path_mswep_temporal_aggregated = paste0(path_mswep, "/temporal_aggregated")
-path_mswep_temporal_aggregated_modis = paste0(path_mswep, "/temporal_aggregated_modis_proj")
-
-# Path to Maryland
-path_maryland = paste0(path_data, "/maryland")
-path_maryland_org = paste0(path_maryland, "/org")
-path_maryland_modis = paste0(path_maryland, "/maryland_modis_proj")
-
 # Path to results etc.
 path_rdata = paste0(path_data, "/rdata")
 path_temp = paste0(path_data, "/temp")
 path_output = paste0(path_data, "/output/")
 path_vectors = paste0(path_data, "/vectors")
+path_mswep = paste0(path_data, "/mswep")
 path_proj = paste0(path_data, "/projection/")
 
 
@@ -74,7 +55,6 @@ library(rgdal)
 library(remote)
 library(satelliteTools)  # devtools::install_github("environmentalinformatics-marburg/satelliteTools")
 library(sp)
-library(snow)
 
 # Other settings ---------------------------------------------------------------
 rasterOptions(tmpdir = path_temp)
